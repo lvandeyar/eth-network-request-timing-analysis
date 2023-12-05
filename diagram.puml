@@ -1,0 +1,44 @@
+@startuml
+!define MODULE class
+!define EXTERNAL class
+!define DATABASE class
+
+skinparam classAttributeIconSize 0
+skinparam rectangle {
+    BackgroundColor<<external>> Wheat
+    BackgroundColor<<database>> LightBlue
+}
+
+MODULE HTTPS
+MODULE DNS
+MODULE Performance
+EXTERNAL "Ethereum Node" as EthereumNode
+DATABASE "JSON-RPC API" as JSONRPC
+
+class "measureEthereumRequest()" as measure {
+    .. Attributes ..
+    - url: String
+    - method: String
+    - params: Array
+    .. Methods ..
+    + measureEthereumRequest(url, method, params): Promise
+}
+
+rectangle "Node.js Environment" {
+    measure --> HTTPS : uses
+    measure --> DNS : uses
+    measure --> Performance : uses
+}
+
+measure --> JSONRPC : sends request
+JSONRPC --> EthereumNode : interfaces with\nEthereum network
+EthereumNode : - Processes RPC requests
+EthereumNode : - Returns block number
+
+class "Client" {
+    + main()
+}
+
+Client --> measure : invokes
+
+@enduml
